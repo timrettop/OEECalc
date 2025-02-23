@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1016217866716",
+    "project_id": "oeecalc",
+    "storage_bucket": "oeecalc.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1016217866716:android:85226c1a36d27c4f95bf19",
+        "android_client_info": {
+          "package_name": "com.timpotter.oeecalc"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyChTKxa9JxfES3VjY37T6uQhV6Wdb5HbNo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
