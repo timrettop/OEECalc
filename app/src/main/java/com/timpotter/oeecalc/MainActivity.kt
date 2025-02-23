@@ -33,6 +33,7 @@ fun OEECalculatorApp() {
     var goodCount by remember { mutableStateOf("950") }
     var idealCycleTime by remember { mutableStateOf("0.5") }
     var result by remember { mutableStateOf("OEE: -\nBreakdown:") }
+    var errorFields by remember { mutableStateOf(setOf<String>()) }
 
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -51,24 +52,37 @@ fun OEECalculatorApp() {
                 colors = CardDefaults.cardColors(containerColor = Color.White)
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    InputField("Planned Production Time in Minutes", plannedProductionTime) { plannedProductionTime = it }
-                    InputField("Operating Time", operatingTime) { operatingTime = it }
-                    InputField("Total Count", totalCount) { totalCount = it }
-                    InputField("Good Count", goodCount) { goodCount = it }
-                    InputField("Ideal Cycle Time", idealCycleTime) { idealCycleTime = it }
+                    InputField("Planned Production Time (minutes)", plannedProductionTime, "Enter time in minutes", "plannedProductionTime" in errorFields) { plannedProductionTime = it }
+                    InputField("Operating Time (minutes)", operatingTime, "Enter time in minutes", "operatingTime" in errorFields) { operatingTime = it }
+                    InputField("Total Count (units)", totalCount, "Enter total produced units", "totalCount" in errorFields) { totalCount = it }
+                    InputField("Good Count (units)", goodCount, "Enter number of good units", "goodCount" in errorFields) { goodCount = it }
+                    InputField("Ideal Cycle Time (minutes per unit)", idealCycleTime, "Enter cycle time per unit", "idealCycleTime" in errorFields) { idealCycleTime = it }
                 }
             }
 
             Spacer(modifier = Modifier.height(16.dp))
             Button(
                 onClick = {
-                    result = calculateOEE(
-                        plannedProductionTime.toDoubleOrNull() ?: 0.0,
-                        operatingTime.toDoubleOrNull() ?: 0.0,
-                        totalCount.toDoubleOrNull() ?: 0.0,
-                        goodCount.toDoubleOrNull() ?: 0.0,
-                        idealCycleTime.toDoubleOrNull() ?: 0.0
-                    )
+                    val errors = mutableSetOf<String>()
+                    val pTime = plannedProductionTime.toDoubleOrNull() ?: -1.0
+                    val oTime = operatingTime.toDoubleOrNull() ?: -1.0
+                    val tCount = totalCount.toDoubleOrNull() ?: -1.0
+                    val gCount = goodCount.toDoubleOrNull() ?: -1.0
+                    val iCycle = idealCycleTime.toDoubleOrNull() ?: -1.0
+
+                    if (pTime <= 0) errors.add("plannedProductionTime")
+                    if (oTime <= 0) errors.add("operatingTime")
+                    if (tCount <= 0) errors.add("totalCount")
+                    if (gCount <= 0) errors.add("goodCount")
+                    if (iCycle <= 0) errors.add("idealCycleTime")
+
+                    errorFields = errors
+
+                    result = if (errors.isEmpty()) {
+                        calculateOEE(pTime, oTime, tCount, gCount, iCycle)
+                    } else {
+                        "Invalid input: All values must be positive numbers."
+                    }
                 },
                 shape = RoundedCornerShape(8.dp)
             ) {
@@ -87,28 +101,31 @@ fun OEECalculatorApp() {
 }
 
 @Composable
-fun InputField(label: String, value: String, onValueChange: (String) -> Unit) {
+fun InputField(label: String, value: String, placeholder: String, isError: Boolean, onValueChange: (String) -> Unit) {
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
         label = { Text(label) },
+        placeholder = { Text(placeholder) },
+        isError = isError,
+        colors = TextFieldDefaults.colors(
+            focusedIndicatorColor = if (isError) Color.Red else MaterialTheme.colorScheme.primary,
+            unfocusedIndicatorColor = if (isError) Color.Red else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+        ),
         modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)
     )
 }
 
 fun calculateOEE(plannedProductionTime: Double, operatingTime: Double, totalCount: Double, goodCount: Double, idealCycleTime: Double): String {
-    if (plannedProductionTime == 0.0 || operatingTime == 0.0 || totalCount == 0.0 || idealCycleTime == 0.0) {
-        return "Invalid input"
-    }
     val availability = operatingTime / plannedProductionTime
     val performance = (idealCycleTime * totalCount) / operatingTime
     val quality = goodCount / totalCount
     val oee = availability * performance * quality * 100
     return "OEE: ${"%.2f".format(oee)}%\n\n" +
             "Breakdown:\n" +
-            "Availability: ${"%.2f".format(availability * 100)}%\n" +
-            "Performance: ${"%.2f".format(performance * 100)}%\n" +
-            "Quality: ${"%.2f".format(quality * 100)}%"
+            "Availability: ${"%.2f".format(availability * 100)}% (time efficiency)\n" +
+            "Performance: ${"%.2f".format(performance * 100)}% (speed efficiency)\n" +
+            "Quality: ${"%.2f".format(quality * 100)}% (good units produced)"
 }
 
 @Preview(showBackground = true)
