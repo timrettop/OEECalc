@@ -3,11 +3,17 @@ package com.timpotter.oeecalc
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.tooling.preview.Preview
 
 class MainActivity : ComponentActivity() {
@@ -28,30 +34,55 @@ fun OEECalculatorApp() {
     var idealCycleTime by remember { mutableStateOf("0.5") }
     var result by remember { mutableStateOf("OEE: -\nBreakdown:") }
 
-    Column(modifier = Modifier.padding(16.dp)) {
-        Text("OEE Calculator", style = MaterialTheme.typography.headlineMedium)
-        Spacer(modifier = Modifier.height(16.dp))
+    Surface(
+        modifier = Modifier.fillMaxSize(),
+        color = Color(0xFFF5F5F5)
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text("OEE Calculator", style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
+            Spacer(modifier = Modifier.height(16.dp))
 
-        InputField("Planned Production Time", plannedProductionTime) { plannedProductionTime = it }
-        InputField("Operating Time", operatingTime) { operatingTime = it }
-        InputField("Total Count", totalCount) { totalCount = it }
-        InputField("Good Count", goodCount) { goodCount = it }
-        InputField("Ideal Cycle Time", idealCycleTime) { idealCycleTime = it }
+            Card(
+                modifier = Modifier.fillMaxWidth().padding(8.dp),
+                shape = RoundedCornerShape(12.dp),
+                colors = CardDefaults.cardColors(containerColor = Color.White)
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    InputField("Planned Production Time in Minutes", plannedProductionTime) { plannedProductionTime = it }
+                    InputField("Operating Time", operatingTime) { operatingTime = it }
+                    InputField("Total Count", totalCount) { totalCount = it }
+                    InputField("Good Count", goodCount) { goodCount = it }
+                    InputField("Ideal Cycle Time", idealCycleTime) { idealCycleTime = it }
+                }
+            }
 
-        Spacer(modifier = Modifier.height(16.dp))
-        Button(onClick = {
-            result = calculateOEE(
-                plannedProductionTime.toDoubleOrNull() ?: 0.0,
-                operatingTime.toDoubleOrNull() ?: 0.0,
-                totalCount.toDoubleOrNull() ?: 0.0,
-                goodCount.toDoubleOrNull() ?: 0.0,
-                idealCycleTime.toDoubleOrNull() ?: 0.0
-            )
-        }) {
-            Text("Calculate")
+            Spacer(modifier = Modifier.height(16.dp))
+            Button(
+                onClick = {
+                    result = calculateOEE(
+                        plannedProductionTime.toDoubleOrNull() ?: 0.0,
+                        operatingTime.toDoubleOrNull() ?: 0.0,
+                        totalCount.toDoubleOrNull() ?: 0.0,
+                        goodCount.toDoubleOrNull() ?: 0.0,
+                        idealCycleTime.toDoubleOrNull() ?: 0.0
+                    )
+                },
+                shape = RoundedCornerShape(8.dp)
+            ) {
+                Text("Calculate", fontSize = 18.sp)
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+            Card(
+                modifier = Modifier.fillMaxWidth().padding(8.dp),
+                shape = RoundedCornerShape(12.dp),
+                colors = CardDefaults.cardColors(containerColor = Color.White)
+            ) {
+                Text(result, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold, modifier = Modifier.padding(16.dp))
+            }
         }
-        Spacer(modifier = Modifier.height(16.dp))
-        Text(result, style = MaterialTheme.typography.bodyLarge)
     }
 }
 
