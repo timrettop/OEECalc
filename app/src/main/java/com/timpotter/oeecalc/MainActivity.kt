@@ -1,9 +1,6 @@
 package com.timpotter.oeecalc
 
 import android.os.Bundle
-import android.widget.Button
-import android.widget.EditText
-import android.widget.TextView
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
@@ -24,12 +21,12 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun OEECalculatorApp() {
-    var plannedProductionTime by remember { mutableStateOf("") }
-    var operatingTime by remember { mutableStateOf("") }
-    var totalCount by remember { mutableStateOf("") }
-    var goodCount by remember { mutableStateOf("") }
-    var idealCycleTime by remember { mutableStateOf("") }
-    var result by remember { mutableStateOf("OEE: -") }
+    var plannedProductionTime by remember { mutableStateOf("480") }
+    var operatingTime by remember { mutableStateOf("450") }
+    var totalCount by remember { mutableStateOf("1000") }
+    var goodCount by remember { mutableStateOf("950") }
+    var idealCycleTime by remember { mutableStateOf("0.5") }
+    var result by remember { mutableStateOf("OEE: -\nBreakdown:") }
 
     Column(modifier = Modifier.padding(16.dp)) {
         Text("OEE Calculator", style = MaterialTheme.typography.headlineMedium)
@@ -76,7 +73,11 @@ fun calculateOEE(plannedProductionTime: Double, operatingTime: Double, totalCoun
     val performance = (idealCycleTime * totalCount) / operatingTime
     val quality = goodCount / totalCount
     val oee = availability * performance * quality * 100
-    return "OEE: ${"%.2f".format(oee)}%"
+    return "OEE: ${"%.2f".format(oee)}%\n\n" +
+            "Breakdown:\n" +
+            "Availability: ${"%.2f".format(availability * 100)}%\n" +
+            "Performance: ${"%.2f".format(performance * 100)}%\n" +
+            "Quality: ${"%.2f".format(quality * 100)}%"
 }
 
 @Preview(showBackground = true)
