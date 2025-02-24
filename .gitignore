@@ -10,6 +10,8 @@
 /.idea/studiobot.xml
 .DS_Store
 /build
+*/build/
+**/build/
 /debug
 /captures
 .externalNativeBuild
