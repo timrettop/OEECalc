@@ -74,7 +74,9 @@ fun OEECalculatorApp(firebaseAnalytics: FirebaseAnalytics) {
                 }
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(8.dp))
+            Text("OEE = Availability x Performance x Quality", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
+            Spacer(modifier = Modifier.height(8.dp))
             Button(
                 onClick = {
                     val errors = mutableSetOf<String>()
@@ -84,18 +86,18 @@ fun OEECalculatorApp(firebaseAnalytics: FirebaseAnalytics) {
                     val bCount = badCount.toDoubleOrNull() ?: -1.0
                     val iCycle = idealCycleTime.toDoubleOrNull() ?: -1.0
 
-                    if (pTime <= 0) errors.add("plannedProductionTime")
-                    if (oTime <= 0) errors.add("operatingTime")
-                    if (tCount <= 0) errors.add("totalCount")
-                    if (bCount <= 0) errors.add("badCount")
-                    if (iCycle <= 0) errors.add("idealCycleTime")
+                    if (pTime < 0) errors.add("plannedProductionTime")
+                    if (oTime < 0) errors.add("operatingTime")
+                    if (tCount < 0) errors.add("totalCount")
+                    if (bCount < 0) errors.add("badCount")
+                    if (iCycle < 0) errors.add("idealCycleTime")
 
                     errorFields = errors
 
                     result = if (errors.isEmpty()) {
                         calculateOEE(pTime, oTime, tCount, bCount, iCycle, firebaseAnalytics)
                     } else {
-                        "Invalid input: All values must be positive numbers."
+                        "Invalid input: All values must be zero or positive numbers."
                     }
                 },
                 shape = RoundedCornerShape(6.dp)
