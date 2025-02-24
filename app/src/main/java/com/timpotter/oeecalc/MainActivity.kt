@@ -47,34 +47,34 @@ fun OEECalculatorApp(firebaseAnalytics: FirebaseAnalytics) {
         color = Color(0xFFF5F5F5)
     ) {
         Column(
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier.padding(12.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text("OEE Calculator", style = MaterialTheme.typography.headlineLarge, fontWeight = FontWeight.Bold)
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
             Card(
-                modifier = Modifier.fillMaxWidth().padding(8.dp),
-                shape = RoundedCornerShape(12.dp),
+                modifier = Modifier.fillMaxWidth().padding(6.dp),
+                shape = RoundedCornerShape(8.dp),
                 colors = CardDefaults.cardColors(containerColor = Color.White)
             ) {
                 Text("Availability", style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
-                Column(modifier = Modifier.padding(16.dp)) {
+                Column(modifier = Modifier.padding(12.dp)) {
                     InputField("Planned Production Time (minutes)", plannedProductionTime, "Enter time in minutes", "plannedProductionTime" in errorFields) { plannedProductionTime = it }
                     InputField("Operating Time (minutes)", operatingTime, "Enter time in minutes", "operatingTime" in errorFields) { operatingTime = it }
                 }
                 Text("Performance", style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
-                Column(modifier = Modifier.padding(16.dp)) {
+                Column(modifier = Modifier.padding(12.dp)) {
                     InputField("Total Count (units)", totalCount, "Enter total produced units", "totalCount" in errorFields) { totalCount = it }
                     InputField("Ideal Cycle Time (minutes per unit)", idealCycleTime, "Enter cycle time per unit", "idealCycleTime" in errorFields) { idealCycleTime = it }
                 }
                 Text("Quality", style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
-                Column(modifier = Modifier.padding(16.dp)) {
+                Column(modifier = Modifier.padding(12.dp)) {
                     InputField("Reject Count (units)", badCount, "Enter number of reject units", "badCount" in errorFields) { badCount = it }
                 }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(12.dp))
             Button(
                 onClick = {
                     val errors = mutableSetOf<String>()
@@ -98,17 +98,17 @@ fun OEECalculatorApp(firebaseAnalytics: FirebaseAnalytics) {
                         "Invalid input: All values must be positive numbers."
                     }
                 },
-                shape = RoundedCornerShape(8.dp)
+                shape = RoundedCornerShape(6.dp)
             ) {
-                Text("Calculate", fontSize = 18.sp)
+                Text("Calculate", fontSize = 14.sp)
             }
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(12.dp))
             Card(
-                modifier = Modifier.fillMaxWidth().padding(8.dp),
-                shape = RoundedCornerShape(12.dp),
+                modifier = Modifier.fillMaxWidth().padding(6.dp),
+                shape = RoundedCornerShape(8.dp),
                 colors = CardDefaults.cardColors(containerColor = Color.White)
             ) {
-                Text(result, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold, modifier = Modifier.padding(16.dp))
+                Text(result, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold, modifier = Modifier.padding(12.dp))
             }
         }
     }
