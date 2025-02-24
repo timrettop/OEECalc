@@ -13,6 +13,11 @@
 */build/
 **/build/
 /debug
+*/debug
+**/debug
+/release
+*/release
+**/release
 /captures
 .externalNativeBuild
 .cxx
