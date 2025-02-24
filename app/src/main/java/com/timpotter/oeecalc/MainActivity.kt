@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -12,6 +13,9 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -19,6 +23,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.analytics.ktx.analytics
 import com.google.firebase.ktx.Firebase
+import com.timpotter.oeecalc.R
 
 class MainActivity : ComponentActivity() {
     private lateinit var firebaseAnalytics: FirebaseAnalytics
@@ -34,13 +39,19 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun OEECalculatorApp(firebaseAnalytics: FirebaseAnalytics) {
-    var plannedProductionTime by remember { mutableStateOf("480") }
-    var operatingTime by remember { mutableStateOf("450") }
-    var totalCount by remember { mutableStateOf("1000") }
-    var badCount by remember { mutableStateOf("50") }
-    var idealCycleTime by remember { mutableStateOf("0.5") }
+    var plannedProductionTime by remember { mutableStateOf("")}
+    var operatingTime by remember { mutableStateOf("") }
+    var totalCount by remember { mutableStateOf("") }
+    var badCount by remember { mutableStateOf("") }
+    var idealCycleTime by remember { mutableStateOf("") }
     var result by remember { mutableStateOf("OEE: -\nBreakdown:") }
     var errorFields by remember { mutableStateOf(setOf<String>()) }
+
+    val isButtonEnabled = plannedProductionTime.isNotBlank() &&
+            operatingTime.isNotBlank() &&
+            totalCount.isNotBlank() &&
+            badCount.isNotBlank() &&
+            idealCycleTime.isNotBlank()
 
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -50,7 +61,18 @@ fun OEECalculatorApp(firebaseAnalytics: FirebaseAnalytics) {
             modifier = Modifier.padding(12.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text("OEE Calculator", style = MaterialTheme.typography.headlineLarge, fontWeight = FontWeight.Bold)
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.ic_launcher_foreground), // Use existing asset
+                    contentDescription = "App Logo",
+                    modifier = Modifier.size(96.dp).padding(end = 8.dp)
+                )
+                Text("OEE Calculator", style = MaterialTheme.typography.headlineLarge, fontWeight = FontWeight.Bold)
+            }
             Spacer(modifier = Modifier.height(12.dp))
 
             Card(
@@ -58,18 +80,19 @@ fun OEECalculatorApp(firebaseAnalytics: FirebaseAnalytics) {
                 shape = RoundedCornerShape(8.dp),
                 colors = CardDefaults.cardColors(containerColor = Color.White)
             ) {
-                Text("Availability", style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
-                Column(modifier = Modifier.padding(12.dp)) {
+                Spacer(modifier = Modifier.height(8.dp))
+                Text("Availability", modifier = Modifier.padding(horizontal = 10.dp), style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
+                Column(modifier = Modifier.padding(8.dp)) {
                     InputField("Planned Production Time (minutes)", plannedProductionTime, "Enter time in minutes", "plannedProductionTime" in errorFields) { plannedProductionTime = it }
                     InputField("Operating Time (minutes)", operatingTime, "Enter time in minutes", "operatingTime" in errorFields) { operatingTime = it }
                 }
-                Text("Performance", style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
-                Column(modifier = Modifier.padding(12.dp)) {
+                Text("Performance", modifier = Modifier.padding(horizontal = 10.dp), style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
+                Column(modifier = Modifier.padding(8.dp)) {
                     InputField("Total Count (units)", totalCount, "Enter total produced units", "totalCount" in errorFields) { totalCount = it }
                     InputField("Ideal Cycle Time (minutes per unit)", idealCycleTime, "Enter cycle time per unit", "idealCycleTime" in errorFields) { idealCycleTime = it }
                 }
-                Text("Quality", style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
-                Column(modifier = Modifier.padding(12.dp)) {
+                Text("Quality", modifier = Modifier.padding(horizontal = 10.dp), style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
+                Column(modifier = Modifier.padding(8.dp)) {
                     InputField("Reject Count (units)", badCount, "Enter number of reject units", "badCount" in errorFields) { badCount = it }
                 }
             }
@@ -100,7 +123,8 @@ fun OEECalculatorApp(firebaseAnalytics: FirebaseAnalytics) {
                         "Invalid input: All values must be zero or positive numbers."
                     }
                 },
-                shape = RoundedCornerShape(6.dp)
+                shape = RoundedCornerShape(6.dp),
+                enabled = isButtonEnabled // Button only enabled when all fields have values
             ) {
                 Text("Calculate", fontSize = 14.sp)
             }
@@ -118,15 +142,21 @@ fun OEECalculatorApp(firebaseAnalytics: FirebaseAnalytics) {
 
 @Composable
 fun InputField(label: String, value: String, placeholder: String, isError: Boolean, onValueChange: (String) -> Unit) {
+    val showPlaceholder = remember(value) { value.isEmpty() }
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
         label = { Text(label) },
-        placeholder = { Text(placeholder) },
+        placeholder = {
+            if (showPlaceholder) {
+                Text(placeholder, color = Color(0xFF9E9E9E), fontStyle = FontStyle.Italic)
+            } },
         isError = isError,
         colors = TextFieldDefaults.colors(
             focusedIndicatorColor = if (isError) Color.Red else MaterialTheme.colorScheme.primary,
-            unfocusedIndicatorColor = if (isError) Color.Red else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+            unfocusedIndicatorColor = if (isError) Color.Red else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+            focusedPlaceholderColor = Color(0xFF9E9E9E),
+            unfocusedPlaceholderColor = Color(0xFF9E9E9E)
         ),
         modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)
     )
